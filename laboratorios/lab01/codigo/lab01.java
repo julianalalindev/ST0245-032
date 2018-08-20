@@ -7,12 +7,19 @@
 public class lab01 {
 
 	//Exercise 1.1
-        public static int punto11 (int n){
+        public static int fibonacci (int n){
          if(n==0 || n==1){
            return 1;
          } else {
-           return punto11(n-1)+punto11(n-2);
+           return fibonacci(n-1)+fibonacci(n-2);
     	 }
+	}
+	
+	public static void main (String[] args) {
+	 System.out.println("Fibonnaci(10): "+fibonacci(10));
+	 System.out.println("Fibonnaci(20): "+fibonacci(20));
+	 System.out.println("Fibonnaci(100): "+fibonacci(100));
+	 System.out.println("Fibonnaci(1000): "+fibonacci(1000));
 	}
  
 	//Exercise 2.1
