@@ -1,0 +1,12 @@
+Complejidad
+public void add (int elemento) {
+        if(size==lista.length) {
+            expandirLista();  // n
+        }
+        lista[size]=elemento;
+        size++;
+    }
+
+
+Siendo n el número de elementos que se añaden entonces la complejidad del algoritmo es O(n)
+Los editores de texto deben tener una complejidad menor a O(n) por lo que este algoritmo no funcionaría pues tiene una complejidad mayor a la soportada por los editores de texto
