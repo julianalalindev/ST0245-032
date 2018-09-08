@@ -7,6 +7,25 @@
  */
 public class Lab02
 {
+    //Insertion sort 
+    
+    public static int[] orden(int[] num) {
+       for(int x=1; x<num.length; x++) { 
+           for(int y=x-1; y>=0; y--) {
+               if(num[x]<num[y]) {
+                   int num2=num[x];
+                   num[x]=num[y];
+                   num[y]=num2;
+                   x--;
+               }
+           }
+        }
+       return num;
+   }
+   
+   //Merge sort
+   
+
     //Array 2
 
     //countEvens
