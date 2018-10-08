@@ -59,4 +59,59 @@ public class Punto1 {
         System.out.println("The pivot should be located in position "+pivote);
         return pivote;
     }
+    
+    //1.3
+    //Class to create fridge objects
+    public class Nevera {
+        private int codigo;
+        private String descripcion;
+
+        public Nevera (int codigo, String descripcion) {
+            this.codigo=codigo;
+            this.descripcion=descripcion;
+        }
+
+        public int getCodigo () {
+            return codigo;
+        }
+
+        public String getDescripcion () {
+            return descripcion;
+        }
+    }
+    //Class to create request objects
+    public class Solicitud {
+        private int neverasSolicitadas;
+        private String tienda;
+
+        public Solicitud (int neverasSolicitadas, String tienda) {
+            this.neverasSolicitadas=neverasSolicitadas;
+            this.tienda=tienda;
+        }
+
+        public int getNeverasSolicitadas () {
+            return neverasSolicitadas;
+        }
+
+        public String getTienda () {
+            return tienda;
+        }
+    }
+    
+    public static void neveras (Stack<Nevera> neveras, Queue<Solicitud> solicitudes) {
+        while(solicitudes.peek()!=null) {
+            Solicitud nueva=solicitudes.poll();
+            int nev=nueva.getNeverasSolicitadas();
+            System.out.print(nueva.getTienda()+":");
+            while(neveras.size()!=0 && nev!=0) {
+                Nevera aux=neveras.pop();
+                System.out.print(" ("+aux.getCodigo()+" , "+aux.getDescripcion()+")");
+                nev--;
+            }
+            if(solicitudes.peek()!=null && neveras.size()==0) {
+                System.out.print("No hay más neveras disponibles");
+            }
+            System.out.println();
+        }
+    }
 }
