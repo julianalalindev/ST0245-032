@@ -9,12 +9,12 @@ public class Punto1 {
     
     public static void main (String[] args) {
         //1.2 test
-        List lista = new ArrayList();
-        lista.add(10);
-        lista.add(2);
-        lista.add(4);
-        lista.add(8);
-        pivot(lista);
+        List list = new ArrayList();
+        list.add(10);
+        list.add(2);
+        list.add(4);
+        list.add(8);
+        pivot(list);
     }
     
     //1.1  with LinkedList
@@ -35,81 +35,82 @@ public class Punto1 {
     }
 
    //1.2 with only one loop
-    public static int pivot (List<Integer> lista) {
-        Iterator<Integer> t = lista.iterator();
-        Iterator<Integer> p = lista.iterator();
-        int pivote=1;
+    public static int pivot (List<Integer> list) {
+        Iterator<Integer> t = list.iterator();
+        Iterator<Integer> p = list.iterator();
+        int pivot=1;
         int si=p.next();
-        int actual = p.next();
-        int siguiente = p.next();
+        int a = p.next();
+        int s = p.next();
         int sd=t.next()+t.next()+t.next();
-        sd -= si + actual;
+        sd -= si + a;
         while (t.hasNext()) {         
             sd+=t.next();
             int dif1 = sd - si;
-            int dif2 = sd - siguiente - si - actual;
+            int dif2 = sd - s - si - a;
             if (Math.abs(dif1) > Math.abs(dif2)) {
-                si += actual;
-                sd -= siguiente;
-                pivote++;
-                actual = siguiente;
-                siguiente = p.next();
+                si += a;
+                sd -= s;
+                pivot++;
+                a = s;
+                s = p.next();
             }
         }
-        System.out.println("The pivot should be located in position "+pivote);
-        return pivote;
+        System.out.println("The pivot should be located in position "+pivot);
+        return pivot;
     }
     
     //1.3
     //Class to create fridge objects
-    public class Nevera {
-        private int codigo;
-        private String descripcion;
+    public class Fridge {
+        private int code;
+        private String description;
 
-        public Nevera (int codigo, String descripcion) {
-            this.codigo=codigo;
-            this.descripcion=descripcion;
+        public Fridge (int code, String description) {
+            this.code=code;
+            this.description=description;
         }
 
-        public int getCodigo () {
-            return codigo;
+        public int getCode () {
+            return code;
         }
 
-        public String getDescripcion () {
-            return descripcion;
+        public String getDescription () {
+            return description;
         }
     }
     //Class to create request objects
-    public class Solicitud {
-        private int neverasSolicitadas;
-        private String tienda;
+    public class Request {
+        private int fridgesRequested;
+        private String shop;
 
-        public Solicitud (int neverasSolicitadas, String tienda) {
-            this.neverasSolicitadas=neverasSolicitadas;
-            this.tienda=tienda;
+        public Request (int fridgesRequested, String shop) {
+            this.fridgesRequested=fridgesRequested;
+            this.shop=shop;
         }
 
-        public int getNeverasSolicitadas () {
-            return neverasSolicitadas;
+        public int getFridgesRequested () {
+            return fridgesRequested;
         }
 
-        public String getTienda () {
-            return tienda;
+        public String getShop () {
+            return shop;
         }
     }
     
-    public static void neveras (Stack<Nevera> neveras, Queue<Solicitud> solicitudes) {
-        while(solicitudes.peek()!=null) {
-            Solicitud nueva=solicitudes.poll();
-            int nev=nueva.getNeverasSolicitadas();
-            System.out.print(nueva.getTienda()+":");
-            while(neveras.size()!=0 && nev!=0) {
-                Nevera aux=neveras.pop();
-                System.out.print(" ("+aux.getCodigo()+" , "+aux.getDescripcion()+")");
+    //Implementation
+    public static void fridges (Stack<Fridge> fridges, Queue<Request> requests) {
+        while(requests.peek()!=null) {
+            Request new=requests.poll();
+            int nev=new.getFridgesRequested();
+            System.out.print(new.getShop()+":");
+            while(fridges.size()!=0 && nev!=0) {
+                Fridge aux=fridges.pop();
+                System.out.print(" ("+aux.getCode()+" , "+aux.getDescription()+")");
                 nev--;
             }
-            if(solicitudes.peek()!=null && neveras.size()==0) {
-                System.out.print("No hay más neveras disponibles");
+            if(requests.peek()!=null && fridges.size()==0) {
+                System.out.print("There are no more fridges available");
             }
             System.out.println();
         }
