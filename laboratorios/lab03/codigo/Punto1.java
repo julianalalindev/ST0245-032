@@ -44,17 +44,20 @@ public class Punto1 {
         int s = p.next();
         int sd=t.next()+t.next()+t.next();
         sd -= si + a;
-        while (t.hasNext()) {         
-            sd+=t.next();
-            int dif1 = sd - si;
-            int dif2 = sd - s - si - a;
-            if (Math.abs(dif1) > Math.abs(dif2)) {
+        int dif1 = sd - si;
+        int dif2 = sd - s - si - a;
+        while (t.hasNext() || ((Math.abs(dif1) >= Math.abs(dif2) && p.hasNext()))) {                    
+            if (Math.abs(dif1) >= Math.abs(dif2)) {
                 si += a;
                 sd -= s;
                 pivot++;
                 a = s;
                 s = p.next();
+            } else {
+                sd+=t.next();    
             }
+            dif1 = sd - si;
+            dif2 = sd - s - si - a;
         }
         System.out.println("The pivot should be located in position "+pivot);
         return pivot;
