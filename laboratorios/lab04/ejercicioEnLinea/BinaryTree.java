@@ -1,9 +1,9 @@
 
 /**
- * Write a description of class Lab4 here.
+ * Exercise 2.1
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Isabel Urrego and Juliana Lalinde
+ * @version 15/10/2018
  */
 public class BinaryTree {
 
