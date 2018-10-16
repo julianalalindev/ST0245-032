@@ -1,6 +1,6 @@
 
 /**
- * Excercise 2.2
+ * Exercise 2.2
  *
  * @author Mauricio Toro, Juliana Lalinde e Isabel Urrego
  * @version 15/10/2018
