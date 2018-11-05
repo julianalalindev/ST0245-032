@@ -43,17 +43,17 @@ public class Table {
      * @return 
      */
     private Bee[] readFile (File file) {
-        Bee[] bees = new Bee[10000];
+        Bee[] bees = new Bee[110];
         try{
             BufferedReader r = new BufferedReader(new FileReader(file));
             String bee=r.readLine();
             String[] coordinates;
-            for(int x=0; x<bee.length() && (bee=r.readLine())!=null; x++) {
+            
+            for(int x=0; x<bees.length && (bee=r.readLine())!=null; x++) {
                 coordinates=bee.split(",");
                 //Creates a new bee with all of the coordinates transformed to meters
-                bees[x]=new Bee(Double.parseDouble(coordinates[0])*toMeters*Math.cos(Double.parseDouble(coordinates[1])),Double.parseDouble(coordinates[1])*toMeters,Double.parseDouble(coordinates[2]),coordinates[0]+","+coordinates[1]);
+                bees[x]=new Bee(Double.parseDouble(coordinates[0])*toMeters,Double.parseDouble(coordinates[1])*toMeters,Double.parseDouble(coordinates[2]),coordinates[0]+","+coordinates[1]);
             }  
-            System.out.println("Reading succesful");
         } catch (IOException e){
             System.out.println("There was a mistake reading the file");
         }
@@ -93,7 +93,6 @@ public class Table {
         dimX=(int)Math.ceil((xMax-xMin)/side);
         dimY=(int)Math.ceil((yMax-yMin)/side);
         dimZ=(int)Math.ceil((zMax-zMin)/side);
-        System.out.println(xMax+" "+yMax+" "+zMax);
         System.out.println(xMin+" "+yMin+" "+zMin);
         System.out.println(dimX+" "+dimY+" "+dimZ);
         table= new LinkedList[dimX][dimY][dimZ];
@@ -101,9 +100,8 @@ public class Table {
         collision=new LinkedList();
         toCheck= new LinkedList();
         for(int x=0; x<bees.length && bees[x]!=null; x++) {
-            System.out.println("Hi");
             keys=hashFunction(bees[x]);
-            System.out.println("Hashing succesful");
+            //System.out.println("Hashing succesful");
             if(table[keys[0]][keys[1]][keys[2]]==null){
                 table[keys[0]][keys[1]][keys[2]]= new LinkedList();
             }
@@ -115,7 +113,13 @@ public class Table {
                     
             }else if((table1[keys[0]][keys[1]][keys[2]])==1){
                 
-                toCheck.remove(keys);
+                
+                for (Iterator<int[]> iterator = toCheck.iterator(); iterator.hasNext(); ) {
+                        int[] e = iterator.next();
+                                if (Arrays.equals(e,keys)) {
+                                 iterator.remove();
+                                }
+                    }
                 collision.addAll(table[keys[0]][keys[1]][keys[2]]);
                 table1[keys[0]][keys[1]][keys[2]]=2;
                 
@@ -125,8 +129,9 @@ public class Table {
               }
             
         }
-        System.out.println("Creating succesful");
+        System.out.println("Number of Collisions "+ collision.size());
         checkAdjacent();
+        System.out.println("Number of Collisions "+ collision.size());
         System.out.println("checked");
         writeFile();
         System.out.println("cwritten");
@@ -139,12 +144,9 @@ public class Table {
     private int[] hashFunction (Bee bee) {
         int[] keys=new int[3];
         keys[0]=(int)Math.floor((bee.getX()-xMin)/side);
-        
-        System.out.println(keys[0]);
         keys[1]=(int)Math.floor((bee.getY()-yMin)/side);
-       System.out.println(keys[1]);
         keys[2]=(int)Math.floor((bee.getZ()-zMin)/side);
-        System.out.println(keys[2]);
+        //System.out.println(keys[0]+" "+keys[1]+" "+keys[2]);
         return keys;
     }
     /**
@@ -153,38 +155,55 @@ public class Table {
     
     
     public void checkAdjacent() {
-        while(toCheck.size()!=0){
+        System.out.println("To check size: "+toCheck.size());
+        for(Iterator<int[]> it = toCheck.iterator(); it.hasNext(); ){
          boolean check=false;
-         int[] e = toCheck.pollFirst();
+         
+         int[] e = it.next();
+         System.out.println("eeeeee "+e[0]+" "+e[1]+" "+e[2]);
          Bee element= table[e[0]][e[1]][e[2]].getFirst();
+         
           //Each one loop checks in one adjacent
           
           //1
-          while(e[0]<5 && table[e[0]+1][e[1]][e[2]]!= null ){
+          if(e[0]<dimX-1 && table[e[0]+1][e[1]][e[2]]!= null ){
+              //System.out.println("Here");
               LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
-              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
-                  collision.add(element);
-                  check=true;
-                  break;
-                  
-              }
-          }
+              for (Iterator<Bee> iterator = bees.iterator(); iterator.hasNext(); ) {
+                        Bee bee2 = iterator.next();
+                                if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                                System.out.println("Something added");
+                                collision.add(element);
+                                collision.add(bee2);
+                                check=true;
+                                break;
+                            }
+                    }
+              
+               }
+          
           if(check=true){
               check= false;
               continue;
               
           }
           
+         System.out.println("From 1 to t2");
+          
           //2
-          while(e[0]>0 && table[e[0]-1][e[1]][e[2]]!= null ){
-              LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
+          if(e[0]>0 && table[e[0]-1][e[1]][e[2]]!= null ){
+              System.out.println("He");
+              LinkedList<Bee> bees=table[e[0]-1][e[1]][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
               if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
                   collision.add(element);
+                  collision.add(bee2);
                   check=true;
                   break;
                   
+              }
               }
           }
           if(check=true){
@@ -194,14 +213,18 @@ public class Table {
           }
           
           //3
-          while(e[1]<5 && table[e[0]][e[1]+1][e[2]]!= null ){
-              LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
+          if(e[1]<dimY-1 && table[e[0]][e[1]+1][e[2]]!= null ){
+              System.out.println("Her");
+              LinkedList<Bee> bees=table[e[0]][e[1]+1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
               if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
                   collision.add(element);
                   check=true;
                   break;
                   
+              }
               }
           }
           if(check=true){
@@ -212,14 +235,17 @@ public class Table {
           
           
           //4
-          while(e[1]>0 && table[e[0]][e[1]-1][e[2]]!= null ){
-              LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
+          if(e[1]>0 && table[e[0]][e[1]-1][e[2]]!= null ){
+              LinkedList<Bee> bees=table[e[0]][e[1]-1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
               if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
                   collision.add(element);
                   check=true;
                   break;
                   
+              }
               }
           }
           if(check=true){
@@ -229,14 +255,17 @@ public class Table {
           }
           
           //5
-          while(e[2]<5 && table[e[0]][e[1]][e[2]+1]!= null ){
-              LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
+          if(e[2]<dimZ-1 && table[e[0]][e[1]][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]][e[1]][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
               if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
                   collision.add(element);
                   check=true;
                   break;
                   
+              }
               }
           }
           if(check=true){
@@ -246,9 +275,274 @@ public class Table {
           }
           
           //6
-          while(e[2]>0 && table[e[0]][e[1]][e[2]-1]!= null ){
-              LinkedList<Bee> bees=table[e[0]+1][e[1]][e[2]];
-              Bee bee2= bees.pollFirst();
+          if(e[2]>0 && table[e[0]][e[1]][e[2]-1]!= null ){
+              LinkedList<Bee> bees=table[e[0]][e[1]][e[2]-1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //7
+          if(e[0]<dimX-1 && e[1]<dimY-1 && table[e[0]+1][e[1]+1][e[2]]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]+1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          
+          //8
+           if(e[0]<dimX-1 && e[1]>0 && table[e[0]+1][e[1]-1][e[2]]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]-1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          
+          //9
+           if(e[0]>0 && e[1]>0 && table[e[0]-1][e[1]-1][e[2]]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]-1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          
+          //10
+           if(e[0]>0 && e[1]<dimY-1 && table[e[0]-1][e[1]+1][e[2]]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]+1][e[2]];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //11 with z
+          if(e[0]<dimX-1 && e[1]<dimY-1 && e[2]>0 && table[e[0]+1][e[1]+1][e[2]-1]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]+1][e[2]-1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //12
+          if(e[0]<dimX-1 && e[1]>0 && e[2]>0 && table[e[0]+1][e[1]-11][e[2]-1]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]-1][e[2]-1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //13
+         if(e[0]>0 && e[1]>0 && e[2]>0 && table[e[0]-1][e[1]-1][e[2]-1]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]-1][e[2]-1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //14
+          if(e[0]>0 && e[1]<dimY-1 && e[2]>0 && table[e[0]-1][e[1]+1][e[2]-1]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]+1][e[2]-1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //15 with z
+          if(e[0]<dimX-1 && e[1]<dimY-1 && e[2]<dimZ-1 && table[e[0]+1][e[1]+1][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]+1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //16
+          if(e[0]<dimX-1 && e[1]>0 && e[2]<dimZ-1 && table[e[0]+1][e[1]-11][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]+1][e[1]-1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //17
+          if(e[0]>0 && e[1]>0 && e[2]<dimZ-1 && table[e[0]-1][e[1]-1][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]-1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //18
+          if(e[0]>0 && e[1]<dimY-1 && e[2]<dimZ-1 && table[e[0]-1][e[1]+1][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]+1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              while(listIterator.hasNext()){
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          
+          //19 los de z+1
+          if(e[1]<dimY-1 && e[2]<dimZ-1 && table[e[0]][e[1]+1][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]][e[1]+1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              Bee bee2= listIterator.next();
               if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
                   collision.add(element);
                   check=true;
@@ -262,7 +556,42 @@ public class Table {
               
           }
           
-          //7
+         
+          //20
+          if(e[1]>0 && e[2]<dimZ-1 && table[e[0]][e[1]-1][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]][e[1]-1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
+          
+          //21
+          while(e[0]<dimY-1 && e[2]<dimZ-1 && table[e[0]+1][e[1]][e[2]+1]!= null ){
+              LinkedList<Bee> bees=table[e[0]-1][e[1]+1][e[2]+1];
+              ListIterator<Bee> listIterator = bees.listIterator();
+              Bee bee2= listIterator.next();
+              if(Math.sqrt((bee2.getX()-element.getX())*(bee2.getX()-element.getX())+(bee2.getY()-element.getY())*(bee2.getY()-element.getY())+(bee2.getZ()-element.getZ())*(bee2.getZ()-element.getZ()))<=100){
+                  collision.add(element);
+                  check=true;
+                  break;
+                  
+              }
+          }
+          if(check=true){
+              check= false;
+              continue;
+              
+          }
           
         }
     }
@@ -277,8 +606,10 @@ public class Table {
             }
             file.createNewFile();
             FileWriter writer = new FileWriter(file);
-            for(int x=0; x<collision.size(); x++) {
-                writer.write(collision.get(x).getCoordinatesInDegrees()+","+collision.get(x).getZ());
+            while(collision.size()>0){
+                Bee bee= collision.pollFirst();
+            //for(int x=0; x<collision.size(); x++) {
+                writer.write(bee.getCoordinatesInDegrees()+","+bee.getZ());
             }
             writer.close();
         } catch (IOException e) {
