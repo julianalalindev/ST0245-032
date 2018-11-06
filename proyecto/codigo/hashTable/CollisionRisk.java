@@ -1,6 +1,9 @@
 package proyectoh;
 /**
+ * Algorithm to prevent collisions between robotic bees
+ * Data Structure: Hash Tables
  *
+ * version 5
  * @author Juliana Lalinde and Isabel Urrego
  */
 import java.util.*;
@@ -20,23 +23,37 @@ public class CollisionRisk {
     
     private double minX, minY, minZ, maxX, maxY, maxZ;
     
+    /**
+     * Constructor 
+     * @param numberOfBees  number of bees on the data
+     */
     public CollisionRisk (int numberOfBees) {
         this.numberOfBees=numberOfBees;
         start(new File("ConjuntoDeDatosCon"+numberOfBees+"abejas.txt"));
     }
     
+    /**
+     * Method to start the verification
+     * @param file file with the data of the bees
+     */
     public final void start (File file) {
         bees=new Bee[numberOfBees];
         collisions=new ArrayList();
         readFile(file);
         long startTime = System.currentTimeMillis();
+        double currentMemory = ( (double)((double)(Runtime.getRuntime().totalMemory()/1024)/1024))- ((double)((double)(Runtime.getRuntime().freeMemory()/1024)/1024));
         buildMatrix();
         detectCollisions();
         long estimatedTime = System.currentTimeMillis() - startTime;
         System.out.println("El algoritmo tomo un tiempo de: "+estimatedTime+" ms");
+        System.out.println("Memoria: "+currentMemory+" MB");
         writeFile();
     }
     
+    /**
+     * Method to read the file with the data
+     * @param file File with the data
+     */
     private void readFile (File file) {
     	
     	maxX = -Double.MAX_VALUE;
@@ -80,6 +97,11 @@ public class CollisionRisk {
         }
     }
     
+    /**
+     * Method to build the hash table with given sizes taken from the minimum and maximum valaues of the data
+     * It includes the "hash function" to distribute the bees on an specific cube grid
+     */
+    
     private void buildMatrix() {
     	double side = 100/Math.sqrt(3);
     	int xLength = (int)  Math.ceil((maxX - minX)/side);
@@ -96,6 +118,12 @@ public class CollisionRisk {
     		matrix[x][y][z].add(bees[current]);
     	}   	
     }
+    
+    /**
+     * Method two detect collisions
+     * It transverses the whole table and checks the sizes of the lists inside the positions 
+     * If the size is greater than 1 it adds all the element to the list of collisions. Otherwise, it checks the distance with the bees in adjacent cubes till it finds a collision
+     */
     
     private void detectCollisions() {
     	
@@ -137,6 +165,9 @@ public class CollisionRisk {
     	}
     }
         
+    /**
+     * Method to write the file with the bees in collision risk
+     */
     private void writeFile () {
         File file=new File("CollisionRisk.txt");
         try{
