@@ -1,7 +1,8 @@
 package proyecto;
 /**
- *
+ * *Algorithm to prevent collisions between robotic bees
  * @author Juliana Lalinde and Isabel Urrego
+ * version 3
  */
 public class Proyecto {
     
