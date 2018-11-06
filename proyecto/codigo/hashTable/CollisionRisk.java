@@ -120,7 +120,7 @@ public class CollisionRisk {
     }
     
     /**
-     * Method two detect collisions
+     * Method to detect collisions
      * It transverses the whole table and checks the sizes of the lists inside the positions 
      * If the size is greater than 1 it adds all the element to the list of collisions. Otherwise, it checks the distance with the bees in adjacent cubes till it finds a collision
      */
