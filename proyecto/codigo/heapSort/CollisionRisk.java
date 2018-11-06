@@ -40,8 +40,13 @@ public class CollisionRisk {
         };
         cordX=new Bee[numberOfBees];
         collisions=new ArrayList();
+        cordY=new PriorityQueue(numberOfBees,comp);
+        cordZ = new PriorityQueue(numberOfBees, comp);
         readFile(file);
+        long startTime = System.currentTimeMillis();
         checkX();
+        long estimatedTime = System.currentTimeMillis() - startTime;
+        System.out.println("El algoritmo tomo un tiempo de: "+estimatedTime+" ms");
         writeFile();
     }
     
@@ -67,11 +72,7 @@ public class CollisionRisk {
     }
     
     public void checkX() {
-        cordY=new PriorityQueue(numberOfBees,comp);
         for(int first=0; first<cordX.length; first++) {
-            if(first%10000==0) {
-                System.out.print(".");
-            }
             for(int current=first+1; current<cordX.length; current++) {
                 if(Math.abs(cordX[first].getX()-cordX[current].getX())<=100) {
                     cordX[current].setCompValue(Math.abs(cordX[first].getY()-cordX[current].getY()));
@@ -86,7 +87,6 @@ public class CollisionRisk {
     }
 
     public void checkY(Bee first) {
-        cordZ = new PriorityQueue(numberOfBees, comp);
         Bee current;
         while(cordY.peek()!=null) {
             current=cordY.poll();
