@@ -1,7 +1,8 @@
 package proyecto;
 /**
- *
+ *Algorithm to prevent collisions between robotic bees
  * @author Juliana Lalinde and Isabel Urrego
+ * version 3
  */
 import java.util.*;
 import java.io.*;
@@ -20,11 +21,20 @@ public class CollisionRisk {
     
     private ArrayList<Bee> collisions;
     
+    /**
+     * Constructor
+     * @param numberOfBees amount of the bees in the data
+     */
     public CollisionRisk (int numberOfBees) {
         this.numberOfBees=numberOfBees;
         start(new File("ConjuntoDeDatosCon"+numberOfBees+"abejas.txt"));
     }
     
+    /**
+     * Method to start the verification of collisions
+     *  Overrides method compare to compare the values between two bees
+     * @param file file with the data of the bees
+     */
     public final void start (File file) {
         comp = new Comparator<Bee>() {
             @Override
@@ -50,6 +60,10 @@ public class CollisionRisk {
         writeFile();
     }
     
+    /**
+     * Method to read the file with the data
+     * @param file file with the data of the bees
+     */
     public void readFile (File file) {
         try{
             BufferedReader r = new BufferedReader(new FileReader(file));
@@ -68,6 +82,10 @@ public class CollisionRisk {
         }
     }
     
+    /**
+     * Method to compare and order the bees by their position in X
+     * 
+     */
     public void checkX() {
         for(int first=0; first<cordX.length; first++) {
             for(int current=first+1; current<cordX.length; current++) {
@@ -83,6 +101,10 @@ public class CollisionRisk {
         }
     }
 
+    /**
+     * Method to compare the distance in Y of the bees
+     * @param first bee that is going to be compared with the others
+     */
     public void checkY(Bee first) {
         Bee current;
         while(cordY.peek()!=null) {
@@ -96,6 +118,10 @@ public class CollisionRisk {
         cordZ.clear();
     }
     
+    /**
+     * Method to compare the distance in Z of the bees
+     * @param first bee that is going to be compared with the others
+     */
     public void checkZ(Bee first) {
         Bee current;
         while(cordZ.peek()!=null) {
@@ -107,6 +133,10 @@ public class CollisionRisk {
         }
     }
     
+    /**
+     * Method to add a bee to the list of collisions
+     * @param bee bee that is going to be added if was not
+     */
     public void addCollision (Bee bee) {
         if(!bee.getCollides()) {
             collisions.add(bee);
@@ -114,6 +144,9 @@ public class CollisionRisk {
         }
     }
     
+    /**
+     * Method to write the file with the data of bees in collision risk
+     */
     public void writeFile () {
         File file=new File("CollisionRisk.txt");
         try{
