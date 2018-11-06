@@ -58,10 +58,7 @@ public class CollisionRisk {
             Bee n;
             for(int x=0;(bee=r.readLine())!=null; x++) {
                 coordinates=bee.split(",");
-                //Without cos
-                n=new Bee(Double.parseDouble(coordinates[0])*toMeters,Double.parseDouble(coordinates[1])*toMeters,Double.parseDouble(coordinates[2]),coordinates[0]+","+coordinates[1]);
-                //With cos
-                //n=new Bee(Double.parseDouble(coordinates[0])*toMeters*Math.cos(Double.parseDouble(coordinates[1])),Double.parseDouble(coordinates[1])*toMeters,Double.parseDouble(coordinates[2]),coordinates[0]+","+coordinates[1]);
+                n=new Bee(Double.parseDouble(coordinates[0])*toMeters*Math.cos(Double.parseDouble(coordinates[1])),Double.parseDouble(coordinates[1])*toMeters,Double.parseDouble(coordinates[2]),coordinates[0]+","+coordinates[1]);
                 n.setCompValue(n.getX());
                 cordX[x]=n;
             }
